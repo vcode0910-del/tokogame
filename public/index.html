@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andreas Panel - Cloud</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#0b0e14] text-[#c9d1d9]">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-[#161b22] border-r border-gray-800 flex flex-col">
+            <div class="p-6 text-xl font-black text-blue-500 tracking-tighter">ANDREAS PANEL</div>
+            <nav class="flex-1 px-4 space-y-2">
+                <div onclick="showSection('dashboard')" class="nav-item active" id="btn-dashboard">
+                    <i class="fas fa-th-large mr-3"></i> Dashboard
+                </div>
+                <div onclick="showSection('nodes')" class="nav-item" id="btn-nodes">
+                    <i class="fas fa-server mr-3"></i> Nodes & IP
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-10">
+            <header class="flex justify-between items-center mb-10">
+                <h2 id="page-title" class="text-2xl font-bold italic">Dashboard</h2>
+                <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-lg font-bold text-sm transition">
+                    CREATE NEW SERVER
+                </button>
+            </header>
+
+            <section id="section-dashboard">
+                <div id="server-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Data dari API -->
+                </div>
+            </section>
+
+            <section id="section-nodes" class="hidden">
+                <div class="bg-[#161b22] rounded-xl border border-gray-800 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-[#0d1117] text-gray-400">
+                            <tr>
+                                <th class="p-4">Node Name</th>
+                                <th class="p-4">FQDN / IP Andreas</th>
+                                <th class="p-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="node-list"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Create -->
+    <div id="modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4">
+        <div class="bg-[#161b22] border border-gray-700 p-8 rounded-2xl w-full max-w-md">
+            <h3 class="text-xl font-bold mb-6 text-white">Deploy New Instance</h3>
+            <label class="block text-xs text-gray-400 mb-1">Server Name</label>
+            <input type="text" id="srv-name" class="w-full bg-[#0d1117] border border-gray-700 p-3 rounded-lg mb-4 text-white">
+            
+            <label class="block text-xs text-gray-400 mb-1">Memory (MB)</label>
+            <input type="number" id="srv-memory" value="1024" class="w-full bg-[#0d1117] border border-gray-700 p-3 rounded-lg mb-6 text-white">
+
+            <div class="flex space-x-3">
+                <button onclick="closeModal()" class="flex-1 text-gray-400 hover:text-white">Cancel</button>
+                <button onclick="handleSubmit()" class="flex-2 bg-blue-600 px-6 py-3 rounded-lg font-bold">Deploy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
