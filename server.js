@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
@@ -8,33 +9,71 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// KONFIGURASI PTERODACTYL ANDA
-const PTERO_CONFIG = {
-    domain: 'https://panel.domainanda.com', // Ganti dengan domain panel Anda
-    apiKey: 'ptla_XXXXXXXXXXXXXX'           // Ganti dengan Application API Key Anda
-};
-
-const pteroClient = axios.create({
-    baseURL: PTERO_CONFIG.domain,
+const ptero = axios.create({
+    baseURL: process.env.PTERO_DOMAIN,
     headers: {
-        'Authorization': `Bearer ${PTERO_CONFIG.apiKey}`,
+        'Authorization': `Bearer ${process.env.PTERO_API_KEY}`,
         'Content-Type': 'application/json',
         'Accept': 'Application/vnd.pterodactyl.v1+json',
     }
 });
 
-// API: Ambil Daftar Node dari Pterodactyl
+// Ambil Daftar Server
+app.get('/api/servers', async (req, res) => {
+    try {
+        const response = await ptero.get('/api/application/servers');
+        const servers = response.data.data.map(s => ({
+            id: s.attributes.id,
+            uuid: s.attributes.identifier,
+            name: s.attributes.name,
+            status: 'Active',
+            memory: s.attributes.limits.memory
+        }));
+        res.json(servers);
+    } catch (err) {
+        res.status(500).json({ error: "Gagal ambil data server" });
+    }
+});
+
+// Ambil Daftar Node (IP Andreas)
 app.get('/api/nodes', async (req, res) => {
     try {
-        const response = await pteroClient.get('/api/application/nodes');
-        // Kita petakan agar sesuai dengan format frontend kita
+        const response = await ptero.get('/api/application/nodes');
         const nodes = response.data.data.map(n => ({
             id: n.attributes.id,
             name: n.attributes.name,
-            ip: n.attributes.fqdn,
-            status: n.attributes.maintenance_mode ? 'Maintenance' : 'Online'
+            fqdn: n.attributes.fqdn,
+            scheme: n.attributes.scheme
         }));
         res.json(nodes);
+    } catch (err) {
+        res.status(500).json({ error: "Gagal ambil data node" });
+    }
+});
+
+// Create Server
+app.post('/api/servers', async (req, res) => {
+    try {
+        const { name, memory } = req.body;
+        const payload = {
+            name: name,
+            user: 1, // Default user ID 1
+            egg: 1,  // Default egg ID 1
+            docker_image: "ghcr.io/pterodactyl/yolks:java_17",
+            startup: "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}",
+            limits: { memory: memory, swap: 0, disk: 1024, io: 500, cpu: 100 },
+            feature_limits: { databases: 0, backups: 0 },
+            allocation: { default: 1 } // Pastikan ID Allocation ini ada di Ptero
+        };
+        const response = await ptero.post('/api/application/servers', payload);
+        res.json(response.data);
+    } catch (err) {
+        res.status(500).json({ error: err.response?.data || "Gagal membuat server" });
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Andreas Panel running on http://localhost:${PORT}`));        res.json(nodes);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
