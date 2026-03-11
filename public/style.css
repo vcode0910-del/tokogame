@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+body { font-family: 'Inter', sans-serif; }
+
+.nav-item {
+    @apply flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200 text-gray-400 font-medium;
+}
+
+.nav-item:hover { @apply bg-gray-800 text-white; }
+.nav-item.active { @apply bg-blue-600/10 text-blue-500; }
+
+.card-server {
+    background: linear-gradient(145deg, #1c2128, #161b22);
+    @apply border border-gray-800 p-6 rounded-2xl hover:border-blue-500 transition-all cursor-pointer shadow-xl;
+}
